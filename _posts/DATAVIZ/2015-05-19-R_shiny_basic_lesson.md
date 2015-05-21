@@ -13,7 +13,7 @@ image:
   feature: lidar_GrandMesa.png
   credit: LiDAR data collected over Grand Mesa, Colorado - National Ecological Observatory Network (NEON)
   creditlink: http://www.neoninc.org
-permalink: /R/shiny/
+permalink: /R/Create-Basic-Shiny-App-In-R/
 code1:
 comments: true
 ---
@@ -34,7 +34,6 @@ Shiny has been called 'an R wrapper for JavaScript', but this doesn't quite capt
 ## What kinds of applications can I build with Shiny?
 There are many options! Here are a few ways we have used Shiny:
 
-* <a href="https://cklunch.shinyapps.io/terms_app/">Keep track of NEON data product numbers and related information, like terms and units</a>
 * <a href="http://www.neoninc.org/data-resources/get-data/data-product-availability">Display the upcoming availability of NEON data products</a>
 * Create applications to read in files and output data sheets for NEON field crews
 * Visualize NEON data
@@ -64,16 +63,17 @@ Both ui.R and server.R must be in a single folder together, along with any input
 
 3. Before we make the app actually do anything, we'll put in the code on the server side that will make the app run. In server.R, write the Shiny server function, empty:
 
-    ```
-    shinyServer(function(input,output){
+:
+
+	shinyServer(function(input,output){
     
     })
-    ```
 
 4. On the user interface side, we'll make a title for the app.
 In ui.R, enter:
 
-    ```
+:
+
     shinyUI(
     	fluidPage(
     		titlePanel("This app is awesome"),
@@ -84,11 +84,12 @@ In ui.R, enter:
     		)
     	)
     )
-    ```
 
 5. Save both files, then click on the "Run App" button. Look what you made!
 
 6. If you're used to using R Studio, you'll notice the "Run App" button used to be the "Run" button. This means you can't use that button to try out single lines of code when you're writing shiny apps. The keyboard shortcuts, command-enter or ctrl-enter, still work the normal way.
+* If the "Run" button still appears as usual, first check that you've installed and then loaded the shiny package.
+* If you still don't have a "Run App" button, you may need to close and re-open RStudio.
 
 7. What some of this code is doing:
 * server.R sets up a basic framework that does nothing for now except allow the app to run!
@@ -120,26 +121,28 @@ For learning purposes, it is always great to start from scratch, but using this 
 1. We're going to start by graphing a dummy variable. Most of the action will be on the server side, all we have to do on the user interface side is create a place to put the graph.
 2. Add the dummy variable to your server.R code:
 
-    ```
+:
+
     shinyServer(function(input,output){
     	dummy <- rnorm(100)
     })
-    ```
 
 3. The plot command ("hist" here for a histogram) is nested inside a renderPlot function to create the output object. output$fig is the output object.
 
-    ```
+:
+
     shinyServer(function(input,output){
     	dummy <- rnorm(100)
     	output$fig <- renderPlot(
     		hist(dummy)
     	)
     })
-    ```
+
 
 4. In ui.R we need to make a place for the output object to go. Here we just use the name of the output object, "fig":
 
-    ```
+:
+
     shinyUI(
     	fluidPage(
     		titlePanel("This app is awesome"),
@@ -151,7 +154,7 @@ For learning purposes, it is always great to start from scratch, but using this 
     		)
     	)
     )
-    ```
+
 
 5. Note one very important thing in the ui.R code - there is now a comma after the p() text. Commas separate different panels in the UI, and different commands within the same panel.
 6. Run the app. Look, it's a histogram!
@@ -162,7 +165,8 @@ For learning purposes, it is always great to start from scratch, but using this 
 2. Above, we made the dummy variable in server.R using the rnorm() function. Instead, we can have the UI offer a choice of distributions to sample from, and then plot a histogram of the one we choose.
 3. In ui.R, let's first make a sidebar panel to put the input drop-down menu in:
 
-    ```
+:
+
     shinyUI(
     	fluidPage(
     		titlePanel("This app is awesome"),
@@ -178,12 +182,13 @@ For learning purposes, it is always great to start from scratch, but using this 
     		)
     	)
     )
-    ```
+
 
 4. Note that both mainPanel() and sidebarPanel() are nested in sidebarLayout(). If you run the app at this point, you'll see it runs the same but now has a empty grey box on the side.
 5. Now add the input function to the sidebar:
 
-    ```
+:
+
     shinyUI(
     	fluidPage(
     		titlePanel("This app is awesome"),
@@ -202,11 +207,12 @@ For learning purposes, it is always great to start from scratch, but using this 
     		)
     	)
     )
-    ```
+
 
 6. Now the server.R side needs to know what to do with each option:
 
-    ```
+:
+
     shinyServer(function(input,output){
     	dummy <- reactive({
     		if(input$dist=="Normal")
@@ -220,7 +226,7 @@ For learning purposes, it is always great to start from scratch, but using this 
     		hist(dummy())
     	)
     })
-    ```
+
 
 7. The dummy variable is now a reactive object. Note that in the hist() function we now call hist(dummy()) instead of hist(dummy)
 8. Run the app and cycle through the options!
@@ -230,7 +236,8 @@ For learning purposes, it is always great to start from scratch, but using this 
 1. I made the app generate 100 instances of a random variable by default; let's make the number of instances into a user input.
 2. First we need to make an input entry field on the UI:
 
-    ```
+:
+
     shinyUI(
     	fluidPage(
     		titlePanel("This app is awesome"),
@@ -250,12 +257,13 @@ For learning purposes, it is always great to start from scratch, but using this 
     		)
     	)
     )
-    ```
+
 
 3. value=100 sets the initial value of input$num to 100; if we don't set an initial value the app can't run because it doesn't know what to do with the input.
 4. Now replace the default 100 on the server side with input$num:
 
-    ```
+:
+
     shinyServer(function(input,output){
     	dummy <- reactive({
     		if(input$dist=="Normal")
@@ -269,8 +277,81 @@ For learning purposes, it is always great to start from scratch, but using this 
     		hist(dummy())
     	)
     })
-    ```
 
+5. Extra credit: Right now the plot title says "Histogram of dummy()" no matter what you select. Make the plot title reactive!
+
+
+## Using an existing (local) data file
+1. Plotting random variables is pretty boring, let's plot real data.
+2. Choose a data file from your computer - it can be anything, as long as you know how to load it into R. I'll be using small mammal data from CPER.
+3. First, take the data file and copy it into the awesome_app folder. Remember, Shiny looks for everything it needs in this folder.
+4. Add the command to read in the file to the server script:
+
+:
+
+    shinyServer(function(input,output){
+    	input.data <- read.csv("NEON.D10.CPER.DP1.10072.001.mam_capturedata.csv")
+    	dummy <- reactive({
+    		if(input$dist=="Normal")
+    			return(rnorm(input$num))
+    		if(input$dist=="Cauchy")
+    			return(rcauchy(input$num))
+    		if(input$dist=="Uniform")
+    			return(runif(input$num))
+    	})
+    	output$fig <- renderPlot(
+    		hist(dummy())
+    	)
+    })
+
+5. Now add an option to the reactive object to choose your input data (in my case, I'm plotting mammal weight):
+
+:
+
+    shinyServer(function(input,output){
+    	input.data <- read.csv("NEON.D10.CPER.DP1.10072.001.mam_capturedata.csv")
+    	dummy <- reactive({
+    		if(input$dist=="Normal")
+    			return(rnorm(input$num))
+    		if(input$dist=="Cauchy")
+    			return(rcauchy(input$num))
+    		if(input$dist=="Uniform")
+    			return(runif(input$num))
+    		if(input$dist=="My data")
+    			return(input.data$weight)
+    	})
+    	output$fig <- renderPlot(
+    		hist(dummy())
+    	)
+    })
+    
+6. And finally, add an option to the select list on the UI side:
+
+:
+
+    shinyUI(
+    	fluidPage(
+    		titlePanel("This app is awesome"),
+    		sidebarLayout(
+    			sidebarPanel(
+    				selectInput("dist", 
+    				label="Choose a distribution",
+    				choices=list("Normal","Cauchy","Uniform","My data")),
+    				numericInput("num", label="Input number of samples", value=100)
+    			),
+    			mainPanel(
+    				wellPanel(
+    					p("We're going to put some content here."),
+    					plotOutput("fig")
+    				)
+    			)
+    		)
+    	)
+    )
+
+7. Extra credit: Instead of reading in the data locally, out of the awesome_app folder, make a data upload widget on your app so the user can load their own data.
+* Hint: fileInput() is sufficient on the UI side, but the server side requires a series of commands. See <a href="http://shiny.rstudio.com/gallery/file-upload.html">example code here</a>.
+* And keep in mind things like file type and column names will be very important!
 
 
 
